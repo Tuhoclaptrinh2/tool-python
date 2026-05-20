@@ -1,0 +1,49 @@
+name: Dịch Truyện EPUB
+
+on:
+  workflow_dispatch:
+    inputs:
+      translator_type:
+        description: 'Chọn phương thức dịch'
+        required: true
+        type: choice
+        default: 'google'
+        options:
+          - google
+          - gemini
+          - openrouter
+      ai_model:
+        description: 'Chọn Model AI (Bỏ qua nếu chọn Google dịch)'
+        required: false
+        default: 'google/gemini-2.5-flash'
+        type: string
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Chạy script dịch ngầm với cấu hình đã chọn
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python run_translator.py --engine ${{ github.event.inputs.translator_type }} --model "${{ github.event.inputs.ai_model }}"
+
+      - name: Tải file EPUB thành phẩm lên Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Truyen-Dich-EPUB
+          path: "*.epub"
