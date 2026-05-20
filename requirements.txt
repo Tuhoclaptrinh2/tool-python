@@ -1,0 +1,6 @@
+PyQt6>=6.6.0
+ebooklib>=0.18
+beautifulsoup4>=4.12
+deep-translator>=1.11
+requests>=2.31
+lxml>=4.9
